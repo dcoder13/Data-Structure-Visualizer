@@ -33,6 +33,8 @@ class bars:
         self.canvas.create_rectangle(x, y , x + self.width, 400, fill = self.color)
             
 
+
+
 canvas = Canvas(root, width = 400, height = 400 , background="black")
 canvas.pack()
 
