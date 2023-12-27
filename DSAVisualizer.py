@@ -6,9 +6,8 @@ from tkinter import ttk
 # making the global variables
 array = []
 barsList = []
-
-stopSorting = False
 speed = 5
+sorting = False
 
 class bars:
     def __init__(self, index, height, color, arrayLength):
@@ -32,31 +31,26 @@ class bars:
 def intitDraw():
     for i in range(len(array)):
         barsList.append(bars(i, array[i], "red", len(array)))
-    canvas.update()
-
-
+    
 def reDraw():
     canvas.delete("all")
     for i in range(len(array)):
         barsList[i].draw(canvas)
     canvas.update()
 
-
 # initializing array with random values
 def initArray():
-    global stopSorting
-    stopSorting = True
-    canvas.delete("all")
     array.clear()
     barsList.clear()
     for i in range(50):
         array.append(randint(0, 400))
     intitDraw()
-
+    reDraw()
 
 # can add another option to make custom array
 def customArray():
     pass
+
 
 
 # class from sorting algos
@@ -64,10 +58,10 @@ class sortingAlgos:
     def bubbleSort():
         n = len(array)
         for i in range(n):
-            if stopSorting:
+            if not sorting:
                 return
             for j in range(0, n - i - 1):
-                if stopSorting:
+                if not sorting:
                     return
                 if array[j] > array[j + 1]:
                     array[j], array[j + 1] = array[j + 1], array[j]
@@ -85,7 +79,7 @@ class sortingAlgos:
         for i in range(1, n):
             j = i - 1
             while j >= 0 and array[j+1] < array[j]:
-                if stopSorting:
+                if not sorting:
                     return
                 array[j + 1], array[j] = array[j], array[j+1]
                 barsList[j + 1] = bars(j + 1, array[j + 1], "blue", n)
@@ -93,7 +87,7 @@ class sortingAlgos:
                 reDraw()
                 canvas.after(int(200//speed))
                 j -= 1
-            if stopSorting:
+            if not sorting:
                 return
         print(array)
 
@@ -102,7 +96,7 @@ class sortingAlgos:
         n = len(array)
         for i in range(n):
             for j in range(i+1,n):
-                if stopSorting:
+                if not sorting:
                     return
                 if array[i] > array[j]:
                     array[i], array[j] = array[j], array[i]
@@ -110,7 +104,7 @@ class sortingAlgos:
                     barsList[j] = bars(j, array[j], "red", n)
                     reDraw()
                     canvas.after(int(200//speed))
-            if stopSorting:
+            if not sorting:
                 return
             barsList[i] = bars(i, array[i], "blue", n)
             reDraw()
@@ -142,6 +136,8 @@ class sortingAlgos:
                 else:
                     array[k] = R[j]
                     j += 1
+                if not sorting:
+                    return
                 barsList[k] = bars(k, array[k], "blue", len(array))
                 reDraw()
                 canvas.after(int(200//speed))
@@ -150,6 +146,8 @@ class sortingAlgos:
                 if stopSorting:
                     return
                 array[k] = L[i]
+                if not sorting:
+                    return
                 barsList[k] = bars(k, array[k], "blue", len(array))
                 reDraw()
                 canvas.after(int(200//speed))
@@ -159,6 +157,8 @@ class sortingAlgos:
                 if stopSorting:
                     return
                 array[k] = R[j]
+                if not sorting:
+                    return
                 barsList[k] = bars(k, array[k], "blue", len(array))
                 reDraw()
                 canvas.after(int(200//speed))
@@ -182,7 +182,7 @@ class sortingAlgos:
             i = low - 1
             pivot = array[high]
             for j in range(low, high):
-                if stopSorting:
+                if not sorting:
                     return
                 if array[j] < pivot:
                     i += 1
@@ -251,9 +251,15 @@ canvas.pack(pady=10)
 
 
 # creating the selection frame
-selectionFrame = tk.Frame(root)
-selectionFrame.configure(height=500, width=200)
-selectionFrame.pack(side=tk.RIGHT, anchor="n")
+menuFrame = tk.Frame(root)
+menuFrame.configure(height=500, width=200)
+menuFrame.pack(side=tk.RIGHT, anchor="n")
+
+selectionFrame = tk.Frame(menuFrame, width=200)
+selectionFrame.pack()
+
+controlFrame = tk.Frame(menuFrame, width=200)
+controlFrame.pack()
 
 # creating the selection label
 selectionLabel = tk.Label(
@@ -278,46 +284,72 @@ selection["values"] = (
 )
 selection.current(0)
 selection.pack(pady=10)
+# selection.bind("<<ComboboxSelected>>", frameToggle)
 
+def frameToggle(event):
+    selectedOption = selection.get()
+    switcher = {
+        "Bubble Sort": bubbleSortFrame,
+        "Insertion Sort": insertionSortFrame,
+        "Selection Sort": selectionSortFrame,
+        "Merge Sort": mergeSortFrame,
+        "Quick Sort": quickSortFrame,
+    }
 
 def startSort():
-    global stopSorting
-    stopSorting = False
+    global sorting
+    if(sorting == True):
+        reset()
+    sorting = True
     selected_option = selection.get()
     switcher = {
         "Bubble Sort": sortingAlgos.bubbleSort,
         "Insertion Sort": sortingAlgos.insertionSort,
         'Selection Sort': sortingAlgos.selectionSort,
         'Merge Sort': sortingAlgos.mergeSort,
-        'Quick Sort': sortingAlgos.quickSort
+        'Quick Sort': sortingAlgos.quickSort,
+
     }
+    startButton.config(text="Stop", command=stopSort)
     func = switcher.get(selected_option, lambda: "Invalid")
     func()
 
 
+def stopSort():
+    global sorting
+    sorting = False
+    startButton.config(text="Start", command=startSort)
+
+def reset():
+    global sorting
+    sorting = False
+    initArray()
+    startButton.config(text="Start", command=startSort)
+    startButton.pack()
+    
+
 # start button
-startButton = tk.Button(selectionFrame, text="Start", command=startSort, width=200)
-startButton.pack(pady=10)
+startButton = tk.Button(controlFrame, text="Start", command=startSort, width=200)
+startButton.pack(pady=5)
 
 # reset button
-resetButton = tk.Button(selectionFrame, text="Reset", command=initArray, width=200)
-resetButton.pack(pady=10)
+resetButton = tk.Button(controlFrame, text="Reset", command=reset, width=200)
+resetButton.pack(pady=5)
 
 #frame for algo speed
-speedFrame = tk.Frame(selectionFrame, width=200)
-speedFrame.pack(pady=10)
-speedLabel = tk.Label(speedFrame, text="Speed", width=100, background="black", foreground="white")
-speedLabel.pack(pady=10)
-speedVar = tk.IntVar(speedFrame, 5)
+speedLabel = tk.Label(controlFrame, text="Speed", width=100, background="black", foreground="white")
+speedLabel.pack(pady=3)
+speedVar = tk.IntVar(controlFrame, 5)
 # scroll bar for speed
-speedScale = tk.Scale(speedFrame, from_=1, to=100, orient=tk.HORIZONTAL, variable=speedVar, resolution = 1)
+speedScale = tk.Scale(controlFrame, from_=1, to=100, orient=tk.HORIZONTAL, variable=speedVar, resolution = 1)
 speedScale.set(5)
-speedScale.pack(pady=10)
+speedScale.pack(pady=2)
 
 # text box for speed
-speedEntry = tk.Entry(speedFrame, textvariable=speedVar, width=10)
+speedEntry = tk.Entry(controlFrame, textvariable=speedVar, width=10)
 speedEntry.insert(0, speedVar.get())
-speedEntry.pack(side=tk.LEFT, pady=10)
+speedEntry.pack(pady=5)
+
 def updateSpeedScale(*args):
     global speed
     if speedVar.get():
@@ -325,6 +357,8 @@ def updateSpeedScale(*args):
     else:
         speed = 1
 speedVar.trace_add("write", updateSpeedScale)
+
+
 
 initArray()
 root.mainloop()
