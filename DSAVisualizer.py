@@ -120,6 +120,8 @@ class sortingAlgos:
         print(array)
         n = len(array)
         def merge(low, mid, high):
+            if stopSorting:
+                return
             n1 = mid - low + 1
             n2 = high - mid
             L = [0] * (n1)
@@ -132,6 +134,8 @@ class sortingAlgos:
             j = 0
             k = low
             while i < n1 and j < n2:
+                if stopSorting:
+                    return
                 if L[i] <= R[j]:
                     array[k] = L[i]
                     i += 1
@@ -143,6 +147,8 @@ class sortingAlgos:
                 canvas.after(int(200//speed))
                 k += 1
             while i < n1:
+                if stopSorting:
+                    return
                 array[k] = L[i]
                 barsList[k] = bars(k, array[k], "blue", len(array))
                 reDraw()
@@ -150,6 +156,8 @@ class sortingAlgos:
                 i += 1
                 k += 1
             while j < n2:
+                if stopSorting:
+                    return
                 array[k] = R[j]
                 barsList[k] = bars(k, array[k], "blue", len(array))
                 reDraw()
@@ -158,6 +166,8 @@ class sortingAlgos:
                 k += 1
         def divide(low, high):
             if low < high:
+                if stopSorting:
+                    return
                 mid = (low + high) // 2
                 divide(low, mid)
                 divide(mid + 1, high)
@@ -192,10 +202,14 @@ class sortingAlgos:
                 pi = partition(low, high)
                 quick(low, pi-1)
                 for i in range(low, pi):
+                    if stopSorting:
+                        return
                     barsList[i] = bars(i, array[i], "blue", n)
                 canvas.after(int(200//speed))
                 quick(pi+1, high)
                 for i in range(pi, high+1):
+                    if stopSorting:
+                        return
                     barsList[i] = bars(i, array[i], "blue", n)
                 canvas.after(int(200//speed))
         quick(0, n-1)
