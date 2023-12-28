@@ -46,7 +46,7 @@ class sortRender:
         else:
             print("paused")
             while(self.speed[1] == 0):
-                self.canvas.after(100)
+                self.canvas.after(50)
                 self.canvas.update()    
 
     def reset(self):
