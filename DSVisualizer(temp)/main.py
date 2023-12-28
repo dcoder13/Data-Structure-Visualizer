@@ -20,16 +20,18 @@ class DataStructureVisualizer:
 
         if(self.speed[1] == 0):
             self.speed[1] = 1
-            return
+            return False
         else:
             # (self.speed[1] == -1):
             self.speed[1] = 1
             try:
                 SR.startSort(selection)
+                self.speed[1] = -1
             except Exception as e:
                 print(e)
                 if(e.args[0] == "Sort Stopped"):
                     SR.reset()
+        return True
  
     def pause_compute(self):
         self.speed[1] = 0
@@ -93,7 +95,9 @@ class DataStructureVisualizer:
 
         def start_button_clicked():
             start_button.configure(text="Pause", command=pause_button_clicked)
-            self.start_compute(SR, selection)
+            completed = self.start_compute(SR, selection)
+            if completed:
+                start_button.configure(text="Start", command=start_button_clicked)
         
         def pause_button_clicked():
             start_button.configure(text="Start", command=start_button_clicked)
@@ -102,6 +106,7 @@ class DataStructureVisualizer:
         def reset_button_clicked():
             self.stop_compute()
             start_button.configure(text="Start", command=start_button_clicked)
+            SR.reset()
 
         # start button
         start_button = tk.Button(
