@@ -3,12 +3,11 @@ from .bar import bar
 
 
 class sortingAlgos:
-    def __init__(self , reDraw , array, barsList, canvas, speed):
+    def __init__(self , nextFrame , array, barsList, canvas):
         self.array = array
         self.barsList = barsList
         self.canvas = canvas
-        self.speed = speed
-        self.reDraw = reDraw
+        self.nextFrame = nextFrame
 
     def bubbleSort(self):
         n = len(self.array)
@@ -19,8 +18,7 @@ class sortingAlgos:
                     self.array[j], self.array[j + 1] = self.array[j + 1], self.array[j]
                     self.barsList[j] = bar(j, self.array[j], "red", n, self.canvas)
                     self.barsList[j + 1] = bar(j + 1, self.array[j + 1], "red", n, self.canvas)
-                    self.reDraw()
-                    self.canvas.after(int(200//self.speed[0]))
+                    self.nextFrame()
             self.barsList[n - i - 1] = bar(n - i - 1, self.array[n - i - 1], "blue", n, self.canvas)
         self.sorted = True
         print("bubble sort :", self.array)
@@ -34,8 +32,7 @@ class sortingAlgos:
                 self.array[j + 1], self.array[j] = self.array[j], self.array[j+1]
                 self.barsList[j + 1] = bar(j + 1, self.array[j + 1], "blue", n, self.canvas)
                 self.barsList[j] = bar(j, self.array[j], "blue", n, self.canvas)
-                self.reDraw()
-                self.canvas.after(int(200//self.speed[0]))
+                self.nextFrame()
                 j -= 1
         print(self.array)
 
@@ -48,10 +45,9 @@ class sortingAlgos:
                     self.array[i], self.array[j] = self.array[j], self.array[i]
                     self.barsList[i] = bar(i, self.array[i], "blue", n, self.canvas)
                     self.barsList[j] = bar(j, self.array[j], "red", n, self.canvas)
-                    self.reDraw()
-                    self.canvas.after(int(200//self.speed[0]))
+                    self.nextFrame()
             self.barsList[i] = bar(i, self.array[i], "blue", n, self.canvas)
-            self.reDraw()
+            self.nextFrame()
         print("insertion sort: ", self.array)
 
     def mergeSort(self):
@@ -77,21 +73,18 @@ class sortingAlgos:
                     self.array[k] = R[j]
                     j += 1
                 self.barsList[k] = bar(k, self.array[k], "blue", n, self.canvas)
-                self.reDraw()
-                self.canvas.after(int(200//self.speed[0]))
+                self.nextFrame()
                 k += 1
             while i < n1:
                 self.array[k] = L[i]
                 self.barsList[k] = bar(k, self.array[k], "blue", n, self.canvas)
-                self.reDraw()
-                self.canvas.after(int(200//self.speed[0]))
+                self.nextFrame()
                 i += 1
                 k += 1
             while j < n2:
                 self.array[k] = R[j]
                 self.barsList[k] = bar(k, self.array[k], "blue", n, self.canvas)
-                self.reDraw()
-                self.canvas.after(int(200//self.speed[0]))
+                self.nextFrame()
                 j += 1
                 k += 1
         def divide(low, high):
@@ -117,24 +110,24 @@ class sortingAlgos:
                     self.array[i], self.array[j] = self.array[j], self.array[i]
                     self.barsList[i] = bar(i, self.array[i], "red", n, self.canvas)
                     self.barsList[j] = bar(j, self.array[j], "red", n, self.canvas)
-                    self.reDraw()
-                    self.canvas.after(int(200//self.speed[0]))
+                    self.nextFrame()
+    
             self.array[i+1], self.array[high] = self.array[high], self.array[i+1]
             self.barsList[i+1] = bar(i+1, self.array[i+1], "green", n, self.canvas)
             self.barsList[high] = bar(high, self.array[high], "red", n, self.canvas)
-            self.reDraw()
-            self.canvas.after(int(200//self.speed[0]))
+            self.nextFrame()
             return i+1
+        
         def quick(low, high):
             if low < high:
                 pi = partition(low, high)
                 quick(low, pi-1)
                 for i in range(low, pi):
                     self.barsList[i] = bar(i, self.array[i], "blue", n, self.canvas)
-                self.canvas.after(int(200//self.speed[0]))
+
                 quick(pi+1, high)
                 for i in range(pi, high+1):
                     self.barsList[i] = bar(i, self.array[i], "blue", n, self.canvas)
-                self.canvas.after(int(200//self.speed[0]))
+
         quick(0, n-1)
         print("quick sort :", self.array)

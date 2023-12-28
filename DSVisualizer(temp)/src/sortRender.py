@@ -11,6 +11,7 @@ class sortRender:
         self.barsList = []
         self.canvas = canvas
         self.speed = speed
+        self.initArray()
      
     def initArray(self):
         self.canvas.delete("all")
@@ -36,6 +37,18 @@ class sortRender:
             self.barsList[i].draw(self.canvas)
         self.canvas.update()
 
+    def nextFrame(self):
+        self.reDraw()
+        if(self.speed[1] == -1):
+            raise Exception("Sort Stopped")
+        elif(self.speed[1] > 0):
+            self.canvas.after(int(200//self.speed[0]))
+        else:
+            print("paused")
+            while(self.speed[1] == 0):
+                self.canvas.after(100)
+                self.canvas.update()    
+
     def reset(self):
         self.initArray()
 
@@ -43,7 +56,7 @@ class sortRender:
         self.initArray()
         selected_option = selection.get()
         print(selected_option,"from sortRender")
-        SA = sortingAlgos(self.reDraw, self.array, self.barsList, self.canvas, self.speed)
+        SA = sortingAlgos(self.nextFrame, self.array, self.barsList, self.canvas)
         switcher = {
             "Bubble Sort": SA.bubbleSort,
             "Insertion Sort": SA.insertionSort,

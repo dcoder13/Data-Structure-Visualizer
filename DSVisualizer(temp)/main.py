@@ -5,112 +5,172 @@ from src import sortRender
 from src import dsRender
 
 
-root = tk.Tk()
-root.title("Data Structure Visualizer")
-root.geometry("700x500")
-root.configure(background="white")
-root.resizable(False, False)
-  
-def startCompute( SR , canvas , selection , speed):
-    global computeThread
-    # computeThread = threading.Thread(target=SR.startSort, args=(selection,))
-    # computeThread.start()
-    SR.startSort(selection)
+class DataStructureVisualizer:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Data Structure Visualizer")
+        self.root.geometry("700x500")
+        self.root.configure(background="white")
+        self.root.resizable(False, False)
+        # when speed[1] = -1 : stop , 0 : pause , 1 : normal
+        self.speed = [50,-1]
 
-def stopCompute(SR):
-    SR.reset()    
-    pass
+    def start_compute(self, SR , selection):
+        print("start compute")
 
-def secondaryFrameSetup():
-    global speed
-    speed = [50]
-    secondaryFrame = tk.Frame(root)
-
-    # title Frame
-    titleFrame = tk.Frame(secondaryFrame)
-    titleFrame.pack()
-    titleLabel = tk.Label(
-        titleFrame,
-        text="DSA Visualizer",
-        width=700,
-        font=("Serif Sans", 15),
-        background="black",
-        foreground="white",
-        justify="center",
-        anchor="center",
-    )
-    titleLabel.config(padx=10, pady=10)
-    titleLabel.pack()
-
-    # setting up the canvas
-    canvasFrame = tk.Frame(secondaryFrame)
-    canvasFrame.pack(side=tk.LEFT)
-    canvas = tk.Canvas(canvasFrame, width=500, height=400, background="black")
-    canvas.pack(pady=10)
-    selectionFrame = tk.Frame(secondaryFrame)
-    selectionFrame.configure(height=500, width=200)
-    selectionFrame.pack(side=tk.RIGHT, anchor="n")
-    selectionLabel = tk.Label(
-        selectionFrame,
-        text="Select Algorithm",
-        font=("Serif Sans", 10),
-        width="200",
-        background="black",
-        foreground="white",
-    )
-    selectionLabel.pack(pady=10)
-
-    # creating the selection combobox
-    selection = tk.ttk.Combobox(selectionFrame, width=200)
-    selection["values"] = (
-        "Bubble Sort",
-        "Insertion Sort",
-        "Selection Sort",
-        "Merge Sort",
-        "Quick Sort",
-    )
-    selection.current(0)
-    selection.pack(pady=10)
-
-    SR = sortRender.sortRender(canvas, speed)    
-
-    # start button
-    startButton = tk.Button(selectionFrame, text="Start", command=lambda: startCompute(SR , canvas , selection , speed), width=200)
-    startButton.pack(pady=10)
-
-    # reset button
-    resetButton = tk.Button(selectionFrame, text="Reset", command=lambda: stopCompute(SR), width=200)
-    resetButton.pack(pady=10)
-
-    # frame for algo speed
-    speedFrame = tk.Frame(selectionFrame, width=200)
-    speedFrame.pack(pady=10)
-    speedLabel = tk.Label(speedFrame, text="Speed", width=100, background="black", foreground="white")
-    speedLabel.pack(pady=10)
-    speedVar = tk.IntVar(speedFrame, 5)
-    # scroll bar for speed
-    speedScale = tk.Scale(speedFrame, from_=1, to=100, orient=tk.HORIZONTAL, variable=speedVar, resolution = 1)
-    speedScale.set(speed[0])
-    speedScale.pack(pady=10)
-
-    # text box for speed
-    speedEntry = tk.Entry(speedFrame, textvariable=speedVar, width=10)
-    speedEntry.insert(0, speedVar.get())
-    speedEntry.pack(side=tk.LEFT, pady=10)
-
-    def updateSpeedScale(*args):
-        if speedVar.get():
-            global speed
-            speed[0] = min(100, speedVar.get())
+        if(self.speed[1] == 0):
+            self.speed[1] = 1
+            return
         else:
-            speed[0] = 1
-    speedVar.trace_add("write", updateSpeedScale)
-    secondaryFrame.pack()
+            # (self.speed[1] == -1):
+            self.speed[1] = 1
+            try:
+                SR.startSort(selection)
+            except Exception as e:
+                print(e)
+                if(e.args[0] == "Sort Stopped"):
+                    SR.reset()
+ 
+    def pause_compute(self):
+        self.speed[1] = 0
 
-def mainFrameSetup():
-    pass
+    def stop_compute(self):
+        self.speed[1] = -1
 
-secondaryFrameSetup()
-root.mainloop()
+    def secondary_frame_setup(self):
+        secondary_frame = tk.Frame(self.root)
+
+        # title Frame
+        title_frame = tk.Frame(secondary_frame)
+        title_frame.pack()
+        title_label = tk.Label(
+            title_frame,
+            text="DSA Visualizer",
+            width=700,
+            font=("Serif Sans", 15),
+            background="black",
+            foreground="white",
+            justify="center",
+            anchor="center",
+        )
+        title_label.config(padx=10, pady=10)
+        title_label.pack()
+
+        # setting up the canvas
+        canvas_frame = tk.Frame(secondary_frame)
+        canvas_frame.pack(side=tk.LEFT)
+        canvas = tk.Canvas(canvas_frame, width=500, height=400, background="black")
+        canvas.pack(pady=10)
+        selection_frame = tk.Frame(secondary_frame)
+        selection_frame.configure(height=500, width=200)
+        selection_frame.pack(side=tk.RIGHT, anchor="n")
+        selection_label = tk.Label(
+            selection_frame,
+            text="Select Algorithm",
+            font=("Serif Sans", 10),
+            width="200",
+            background="black",
+            foreground="white",
+        )
+        selection_label.pack(pady=10)
+
+        # creating the selection combobox
+        selection = tk.ttk.Combobox(selection_frame, width=200)
+        selection["values"] = (
+            "Bubble Sort",
+            "Insertion Sort",
+            "Selection Sort",
+            "Merge Sort",
+            "Quick Sort",
+        )
+        selection.current(0)
+        selection.pack(pady=5)
+
+        SR = sortRender.sortRender(canvas, self.speed)
+        
+        flow_control_frame = tk.Frame(selection_frame, width=200)
+        flow_control_frame.pack(pady=10)
+
+        def start_button_clicked():
+            start_button.configure(text="Pause", command=pause_button_clicked)
+            self.start_compute(SR, selection)
+        
+        def pause_button_clicked():
+            start_button.configure(text="Start", command=start_button_clicked)
+            self.pause_compute()
+
+        def reset_button_clicked():
+            self.stop_compute()
+            start_button.configure(text="Start", command=start_button_clicked)
+
+        # start button
+        start_button = tk.Button(
+            flow_control_frame,
+            text="Start",
+            command=lambda: start_button_clicked(),
+            width=200,
+        )
+        start_button.pack(pady=10)
+
+        # reset button
+        reset_button = tk.Button(
+            flow_control_frame,
+            text="Reset",
+            command= reset_button_clicked,
+            width=200,
+        )
+        reset_button.pack(pady=10)
+
+        # frame for algo speed
+        speed_frame = tk.Frame(selection_frame, width=200)
+        speed_frame.pack(pady=10)
+        speed_label = tk.Label(
+            speed_frame,
+            text="Speed",
+            width=100,
+            background="black",
+            foreground="white",
+        )
+        speed_label.pack(pady=10)
+        speed_var = tk.IntVar(speed_frame, 5)
+        # scroll bar for speed
+        speed_scale = tk.Scale(
+            speed_frame,
+            from_=1,
+            to=100,
+            orient=tk.HORIZONTAL,
+            variable=speed_var,
+            resolution=1,
+        )
+        speed_scale.set(self.speed[0])
+        speed_scale.pack(pady=10)
+
+        # text box for speed
+        speed_entry = tk.Entry(
+            speed_frame,
+            textvariable=speed_var,
+            width=10,
+        )
+        speed_entry.insert(0, speed_var.get())
+        speed_entry.pack(side=tk.LEFT, pady=10)
+
+        def update_speed_scale(*args):
+            if speed_var.get():
+                self.speed[0] = min(100, speed_var.get())
+            else:
+                self.speed[0] = 1
+
+        speed_var.trace_add("write", update_speed_scale)
+        secondary_frame.pack()
+
+    def main_frame_setup(self):
+        pass
+
+    def run(self):
+        self.secondary_frame_setup()
+        self.root.mainloop()
 
 
+if __name__ == "__main__":
+    visualizer = DataStructureVisualizer()
+    visualizer.run()
