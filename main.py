@@ -4,6 +4,23 @@ from tkinter import ttk
 from src import sortRender
 from src import dsRender
 
+        
+optionDict = {
+    "testStructure":13,
+    "Bubble Sort":1,
+    "Insertion Sort":2,
+    "Selection Sort":3,
+    "Merge Sort":4,
+    "Quick Sort":5,
+    "Stack":6,
+    "Queue":7,
+    "Linked List":8,
+    "Binary Tree":9,
+    "Binary Search Tree":10,
+    "AVL Tree":11,
+    "Graph":12,
+}
+
 
 class DataStructureVisualizer:
     def __init__(self):
@@ -15,17 +32,17 @@ class DataStructureVisualizer:
         # when speed[1] = -1 : stop , 0 : pause , 1 : normal
         self.speed = [50,-1]
 
-    def start_compute(self, SR , selection):
+    def start_compute(self, SR , DR , selection):
         print("start compute")
 
         if(self.speed[1] == 0):
             self.speed[1] = 1
             return False
         else:
-            # (self.speed[1] == -1):
             self.speed[1] = 1
             try:
-                SR.startSort(selection)
+                option = optionDict.get(selection.get())
+                SR.startSort(selection) if option < 5 else DR.startGrid(selection)
                 self.speed[1] = -1
             except Exception as e:
                 print(e)
@@ -61,7 +78,7 @@ class DataStructureVisualizer:
         # setting up the canvas
         canvas_frame = tk.Frame(secondary_frame)
         canvas_frame.pack(side=tk.LEFT)
-        canvas = tk.Canvas(canvas_frame, width=500, height=400, background="black")
+        canvas = tk.Canvas(canvas_frame, width=500, height=500, background="black")
         canvas.pack(pady=10)
         selection_frame = tk.Frame(secondary_frame)
         selection_frame.configure(height=500, width=200)
@@ -76,21 +93,14 @@ class DataStructureVisualizer:
         )
         selection_label.pack(pady=10)
 
-        # creating the selection combobox
         selection = tk.ttk.Combobox(selection_frame, width=200)
-        selection["values"] = (
-            "Bubble Sort",
-            "Insertion Sort",
-            "Selection Sort",
-            "Merge Sort",
-            "Quick Sort",
-        )
+        selection["values"] = list(optionDict.keys())
         selection.current(0)
         selection.pack(pady=5)
 
         SR = sortRender.sortRender(canvas, self.speed)
         DR = dsRender.dsRender(canvas, self.speed)
-
+        
 
         flow_control_frame = tk.Frame(selection_frame, width=200)
         flow_control_frame.pack(pady=10)
@@ -169,6 +179,24 @@ class DataStructureVisualizer:
 
         speed_var.trace_add("write", update_speed_scale)
         secondary_frame.pack()
+
+        # setting up the input box for data structures
+        input_frame = tk.Frame(selection_frame)
+        input_frame.pack(pady=10)
+        input_label = tk.Label(
+            input_frame,
+            text="Input",
+            width=200,
+            background="black",
+            foreground="white",
+        )
+
+        # if the user selects a data structure, then the input box will be displayed
+        def selection_changed(*args):
+            pass
+    
+
+        
 
     def main_frame_setup(self):
         pass

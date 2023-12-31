@@ -12,5 +12,5 @@ class bar:
     def draw(self, canvas):
         self.canvas = canvas
         x = self.index * self.width
-        y = 400 - self.height
+        y = 500 - self.height
         self.canvas.create_rectangle(x, y, x + self.width, 400, fill=self.color)

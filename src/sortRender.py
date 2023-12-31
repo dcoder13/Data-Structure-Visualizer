@@ -24,7 +24,6 @@ class sortRender:
 
     def run(self):
         self.initArray()
-        self.root.mainloop()
 
     def initDraw(self):
         for i in range(len(self.array)):
